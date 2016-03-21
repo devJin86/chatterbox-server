@@ -14,5 +14,10 @@
     "eslint-config-hackreactor": "git://github.com/hackreactor-labs/eslint-config-hackreactor",
     "mocha": "^1.21.4",
     "request": "^2.34.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "querystring": "^0.2.0",
+    "underscore": "^1.8.3"
   }
 }
