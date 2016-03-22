@@ -22,9 +22,20 @@ var path = require('path');
 
 var messages = {results: []};
 
+var checkFile = function(fileUrl) {
+  var fileType = fileUrl.slice(fileUrl.lastIndexOf('.') + 1, fileUrl.length);
+  var result;
+  if (fileType === 'js') {
+    result = 'application/javascript';
+  } else if (fileType === 'css') {
+    result = 'text/css';
+  }
+  return result;
+};
+
 var requestHandler = function(request, response) {
 
-  var statusCode, data, file;
+  var statusCode, data, file, isFile;
   var headers = defaultCorsHeaders;
   
   var pathTo = '../client/client';
@@ -32,26 +43,43 @@ var requestHandler = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   if (request.url === '/') {
-    headers['Content-Type'] = 'html';
+
+    headers['Content-Type'] = 'text/html';
     statusCode = 200;
     data = fs.readFileSync('../client/client/index.html');
     response.writeHead(statusCode, headers);
     response.end(data);
+
   } else if (request.url !== '/classes/messages') {
-    if (true) { // test to see if request.url is a file
-      console.log(pathTo);
+
+    headers['Content-Type'] = checkFile(pathTo);
+    try {
+      fs.readFileSync(pathTo);
+      isFile = true;
+    } catch (e) {
+      console.log(e);
+      isFile = false;
+    }
+    // console.log(isFile);
+
+    if (isFile) { // test to see if request.url is a file
+
       statusCode = 200;
       data = fs.readFileSync(pathTo);
       response.writeHead(statusCode, headers);
       response.end(data);
+
     } else {
+
       statusCode = 404;
       response.writeHead(statusCode, headers);
       response.end();
     }
   } else {
-    headers['Content-Type'] = 'JSON';
+
+    headers['Content-Type'] = 'application/json';
     if (request.method === 'GET') {
+
       statusCode = 200;
       response.writeHead(statusCode, headers);
 
@@ -71,7 +99,10 @@ var requestHandler = function(request, response) {
         response.end();
         // console.log(response);
       });
-      
+    } else if (request.method === 'OPTIONS') {
+      statusCode = 200;
+      response.writeHead(statusCode, headers);
+      response.end();
     }
   }
   
@@ -80,7 +111,8 @@ var requestHandler = function(request, response) {
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
+  'access-control-allow-headers': 'X-Requested-With, X-HTTP-Method-Override, content-type, accept',
+  'access-control-allow-credentials': false,
   'access-control-max-age': 10 // Seconds.
 };
 

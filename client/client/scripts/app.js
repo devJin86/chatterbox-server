@@ -77,9 +77,9 @@ app.addMessage = function(message) {
   } // else { console.log('not current room'); }
 };
 
-app.addRoom = function(roomName) {
-  $('#roomSelect').append('<div>' + roomName + '</div>');
-};
+// app.addRoom = function(roomName) {
+//   $('#roomSelect').append('<div>' + roomName + '</div>');
+// };
 
 app.addFriend = function() {
   var name = $(this)[0].firstChild.textContent;
@@ -89,11 +89,11 @@ app.addFriend = function() {
 };
 
 //TODO: Make this filter stuff
-app.filterMessages = function(data) {
-  _.each(data.results, function(message, i, list) {
-    app.messages.push(message);
-  });
-};
+// app.filterMessages = function(data) {
+//   _.each(data.results, function(message, i, list) {
+//     app.messages.push(message);
+//   });
+// };
 
 app.handleSubmit = function(event) {
   event.preventDefault();
