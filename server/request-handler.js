@@ -14,13 +14,20 @@ this file and include it in basic-server.js so that it actually works.
 // var data = fs.readFileSync('input.txt');
 // console.log("Synchronous read: " + data.toString());
 
-// console.log("Program Ended");
 
 var url = require('url');
 var fs = require('fs');
 var path = require('path');
 
-var messages = {results: []};
+var messages = fs.readFileSync('messages.json', 'utf8');
+
+if (messages !== '') {
+  messages = JSON.parse(messages);
+} else {
+  messages = {results: []};
+}
+console.log(messages);
+
 
 var checkFile = function(fileUrl) {
   var fileType = fileUrl.slice(fileUrl.lastIndexOf('.') + 1, fileUrl.length);
@@ -93,6 +100,14 @@ var requestHandler = function(request, response) {
       request.on('end', function() {
         var newMessage = JSON.parse(body);
         messages.results.push(newMessage);
+
+        fs.writeFile('messages.json', JSON.stringify(messages), function(err) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          console.log('saved');
+        });
 
         statusCode = 201;
         response.writeHead(statusCode, headers);
