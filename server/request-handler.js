@@ -1,18 +1,4 @@
-/*************************************************************
 
-You should implement your request handler function in this file.
-
-requestHandler is already getting passed to http.createServer()
-in basic-server.js, but it won't work as is.
-
-You'll have to figure out a way to export this function from
-this file and include it in basic-server.js so that it actually works.
-
-*Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
-
-**************************************************************/
-// var data = fs.readFileSync('input.txt');
-// console.log("Synchronous read: " + data.toString());
 var headers = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -109,9 +95,6 @@ var requestHandler = function(request, response) {
       respond(200, null, headers, response);
     }
   }
-  
 };
-
-
 
 exports.requestHandler = requestHandler;
