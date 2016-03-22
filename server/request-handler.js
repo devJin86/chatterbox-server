@@ -20,17 +20,16 @@ roomname: 'lobby'}]};
 
 var requestHandler = function(request, response) {
 
-  console.log('PING');
-
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
-  console.log(url.parse(request.url));
 
-  var statusCode = 200;
+  var statusCode;
   var headers = defaultCorsHeaders;
-  headers['Content-Type'] = 'text/JSON';
-  response.writeHead(statusCode, headers);
+  headers['Content-Type'] = 'JSON';
+  
 
   if (request.method === 'GET') {
+    statusCode = 200;
+    response.writeHead(statusCode, headers);
 
     response.end(JSON.stringify(messages));
 
@@ -42,7 +41,11 @@ var requestHandler = function(request, response) {
     request.on('end', function() {
       var newMessage = JSON.parse(body);
       messages.results.push(newMessage);
-      console.log(newMessage);
+
+      statusCode = 201;
+      response.writeHead(statusCode, headers);
+      response.end();
+      // console.log(response);
     });
     
   }
