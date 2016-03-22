@@ -13,7 +13,13 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 // var data = fs.readFileSync('input.txt');
 // console.log("Synchronous read: " + data.toString());
-
+var headers = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'access-control-allow-headers': 'X-Requested-With, X-HTTP-Method-Override, content-type, accept',
+  'access-control-allow-credentials': false,
+  'access-control-max-age': 10 // Seconds.
+};
 
 var url = require('url');
 var fs = require('fs');
@@ -26,8 +32,6 @@ if (messages !== '') {
 } else {
   messages = {results: []};
 }
-console.log(messages);
-
 
 var checkFile = function(fileUrl) {
   var fileType = fileUrl.slice(fileUrl.lastIndexOf('.') + 1, fileUrl.length);
@@ -40,10 +44,14 @@ var checkFile = function(fileUrl) {
   return result;
 };
 
+var respond = function(statusCode, data, headers, response) {
+  response.writeHead(statusCode, headers);
+  response.end(data);
+};
+
 var requestHandler = function(request, response) {
 
   var statusCode, data, file, isFile;
-  var headers = defaultCorsHeaders;
   
   var pathTo = '../client/client';
   pathTo = pathTo + request.url;
@@ -52,10 +60,8 @@ var requestHandler = function(request, response) {
   if (request.url === '/') {
 
     headers['Content-Type'] = 'text/html';
-    statusCode = 200;
     data = fs.readFileSync('../client/client/index.html');
-    response.writeHead(statusCode, headers);
-    response.end(data);
+    respond(200, data, headers, response);
 
   } else if (request.url !== '/classes/messages') {
 
@@ -67,30 +73,19 @@ var requestHandler = function(request, response) {
       console.log(e);
       isFile = false;
     }
-    // console.log(isFile);
 
     if (isFile) { // test to see if request.url is a file
-
-      statusCode = 200;
       data = fs.readFileSync(pathTo);
-      response.writeHead(statusCode, headers);
-      response.end(data);
-
+      respond(200, data, headers, response);
     } else {
-
-      statusCode = 404;
-      response.writeHead(statusCode, headers);
-      response.end();
+      respond(404, null, headers, response);
     }
   } else {
 
     headers['Content-Type'] = 'application/json';
     if (request.method === 'GET') {
 
-      statusCode = 200;
-      response.writeHead(statusCode, headers);
-
-      response.end(JSON.stringify(messages));
+      respond(200, JSON.stringify(messages), headers, response);
 
     } else if (request.method === 'POST') {
       var body = '';
@@ -99,7 +94,7 @@ var requestHandler = function(request, response) {
       });
       request.on('end', function() {
         var newMessage = JSON.parse(body);
-        messages.results.push(newMessage);
+        messages.results.unshift(newMessage);
 
         fs.writeFile('messages.json', JSON.stringify(messages), function(err) {
           if (err) {
@@ -108,27 +103,15 @@ var requestHandler = function(request, response) {
           }
           console.log('saved');
         });
-
-        statusCode = 201;
-        response.writeHead(statusCode, headers);
-        response.end();
-        // console.log(response);
+        respond(201, null, headers, response);
       });
     } else if (request.method === 'OPTIONS') {
-      statusCode = 200;
-      response.writeHead(statusCode, headers);
-      response.end();
+      respond(200, null, headers, response);
     }
   }
   
 };
 
-var defaultCorsHeaders = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'X-Requested-With, X-HTTP-Method-Override, content-type, accept',
-  'access-control-allow-credentials': false,
-  'access-control-max-age': 10 // Seconds.
-};
+
 
 exports.requestHandler = requestHandler;

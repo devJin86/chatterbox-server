@@ -4,7 +4,7 @@ app.friends = [];
 app.rooms = [];
 app.userName;
 app.currentRoom = 'lobby';
-app.url = 'http://127.0.0.1:3000/classes/messages';
+app.url = 'http://10.8.1.22:3000/classes/messages';
 
 app.init = function() {
   // console.log('refresh');
@@ -58,23 +58,15 @@ app.compareFriends = function() {
 app.addMessage = function(message) {
   var username = app.escapeHTML(message['username']);
   var text = app.escapeHTML(message['text']);
-  var room = app.escapeHTML(message['roomname']);
-  if (app.rooms.indexOf(room) === -1) {
-    app.rooms.push(room);
-    $('select').append('<option>' + room + '</option>');
+  var $message = $('<div class="username chat"></div>');
+  if (app.friends.indexOf(username) > -1) {
+    $message = $message.append('<h2 style="color:blue;">' + username + '</h2>');
+  } else {
+    $message = $message.append('<h2>' + username + '</h2>');
   }
-  //console.log(currentRoom, room);
-  if (app.currentRoom === room) {
-    var $message = $('<div class="username chat"></div>');
-    if (app.friends.indexOf(username) > -1) {
-      $message = $message.append('<h2 style="color:blue;">' + username + '</h2>');
-    } else {
-      $message = $message.append('<h2>' + username + '</h2>');
-    }
 
-    $message = $message.append('<p>' + text + '</p>');
-    $('#chats').append($message);
-  } // else { console.log('not current room'); }
+  $message = $message.append('<p>' + text + '</p>');
+  $('#chats').append($message);
 };
 
 // app.addRoom = function(roomName) {
@@ -100,7 +92,7 @@ app.handleSubmit = function(event) {
   var newMessage = {
     username: $('input[name*="username"]').val(),
     text: $('input[name*="message"]').val(),
-    roomname: $('input[name*="room"]').val()
+    roomname: 'lobby'
   };
   app.send(newMessage);
   return false;
@@ -109,10 +101,6 @@ app.handleSubmit = function(event) {
 $(document).ready(function() {
 
   $('#submitFormJezzebelle').submit(app.handleSubmit);
-
-  $('select').on('change', function() {
-    app.currentRoom = $(this).val();
-  });
 
 });
 
