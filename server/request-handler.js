@@ -27,18 +27,18 @@ var requestHandler = function(request, response) {
   var statusCode, data, file;
   var headers = defaultCorsHeaders;
   
-  var pathTo = '../client';
+  var pathTo = '../client/client';
   pathTo = pathTo + request.url;
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   if (request.url === '/') {
     headers['Content-Type'] = 'html';
     statusCode = 200;
-    data = fs.readFileSync('../client/index.html');
+    data = fs.readFileSync('../client/client/index.html');
     response.writeHead(statusCode, headers);
     response.end(data);
   } else if (request.url !== '/classes/messages') {
-    if (true) {
+    if (true) { // test to see if request.url is a file
       console.log(pathTo);
       statusCode = 200;
       data = fs.readFileSync(pathTo);
