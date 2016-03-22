@@ -14,20 +14,20 @@ this file and include it in basic-server.js so that it actually works.
 
 var url = require('url');
 var qs = require('querystring');
-var messages = {results: [{username: 'foo',
-message: 'bar',
-roomname: 'lobby'}]};
+var messages = {results: []};
 
 var requestHandler = function(request, response) {
-
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   var statusCode;
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'JSON';
-  
 
-  if (request.method === 'GET') {
+  console.log('Serving request type ' + request.method + ' for url ' + request.url);
+  if (request.url !== '/classes/messages') {
+    statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end();
+  } else if (request.method === 'GET') {
     statusCode = 200;
     response.writeHead(statusCode, headers);
 
